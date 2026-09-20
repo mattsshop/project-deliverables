@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grand Vista Hotel Construction - Drone Deliverables Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fffbebe6',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            cyan: '#06b6d4',
+                            emerald: '#10b981',
+                            dark: '#080d1a',
+                            card: '#0f172a',
+                            surface: '#1e293b'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Custom styling for sleek high-tech dark construction theme */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #060a12;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        .glow-amber {
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.15);
+        }
+        .glow-cyan {
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.15);
+        }
+        .polycam-gradient {
+            background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+        }
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090e1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f59e0b;
+        }
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-brand-500 selection:text-slate-950 pb-12">
+
+    <!-- Toast Notification Banner -->
+    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-180%] transition-all duration-300 ease-out bg-slate-900 border border-brand-500 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-brand-500 text-lg"></i>
+        <span id="toast-msg" class="text-xs font-semibold">Notification message</span>
+    </div>
+
+    <!-- Main Navigation Header -->
+    <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-amber-600 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-brand-500/20">
+                    <i class="fa-solid fa-helmet-safety"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-black uppercase tracking-wider text-brand-500">Matt's Shop Media Portal</span>
+                        <span id="db-status-badge" class="text-[9px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-mono flex items-center gap-1 border border-slate-700">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Local Data Mode
+                        </span>
+                    </div>
+                    <h1 class="text-sm sm:text-base font-extrabold text-white tracking-tight">Grand Vista Luxury Hotel & Resort</h1>
+                </div>
+            </div>
+
+            <!-- Admin Toggle & Quick Tools -->
+            <div class="flex items-center gap-2">
+                <button id="admin-badge-btn" onclick="openAdminAuthOrPanel()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 hover:border-brand-500/50 rounded-xl text-xs font-semibold flex items-center gap-2 transition shadow-sm">
+                    <i id="admin-lock-icon" class="fa-solid fa-lock text-brand-500"></i>
+                    <span id="admin-btn-text" class="hidden sm:inline">Admin Access</span>
+                </button>
+                <button onclick="openConfigModal()" class="p-2 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 rounded-xl text-xs transition" title="Firebase Settings">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 flex-grow w-full space-y-6">
+
+        <!-- Construction Project Stats KPI Banner -->
+        <section class="bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-950 border border-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden glow-amber">
+            <div class="absolute -right-10 -bottom-10 opacity-5 text-brand-500 pointer-events-none">
+                <i class="fa-solid fa-building text-9xl"></i>
+            </div>
+
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 relative z-10">
+                <div>
+                    <div class="flex flex-wrap items-center gap-2 mb-2.5">
+                        <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                            ACTIVE CONSTRUCTION SITE
+                        </span>
+                        <span class="bg-slate-800/90 text-slate-300 text-xs px-3 py-1 rounded-full border border-slate-700">
+                            <i class="fa-solid fa-location-dot text-brand-cyan mr-1"></i> Austin Lakefront Site
+                        </span>
+                        <span class="bg-slate-800/90 text-slate-400 text-xs px-3 py-1 rounded-full border border-slate-700 font-mono">
+                            Host: mattsshop.com
+                        </span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Grand Vista Resort Construction Surveillance</h2>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1.5 max-w-2xl leading-relaxed">
+                        Weekly drone mission deliverables: 4K aerial flythroughs, orthomosaic aerial mapping, and high-precision 3D Polycam laser & photogrammetry models.
+                    </p>
+                </div>
+
+                <!-- KPI Quick Stats Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-950/80 p-4 rounded-2xl border border-slate-800/80 backdrop-blur-md">
+                    <div class="p-2">
+                        <div class="text-[10px] text-slate-400 uppercase font-semibold">Project Progress</div>
+                        <div id="kpi-progress" class="text-xl font-black text-brand-500 mt-0.5 flex items-baseline gap-1">
+                            <span>68%</span>
+                            <span class="text-[9px] text-slate-500 font-normal">Phase 3</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
+                            <div id="kpi-progress-bar" class="bg-brand-500 h-full rounded-full" style="width: 68%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="p-2 border-l border-slate-800/80">
+                        <div class="text-[10px] text-slate-400 uppercase font-semibold">Total Missions</div>
+                        <div id="kpi-flights" class="text-base font-bold text-white mt-0.5">24 Flights</div>
+                        <div class="text-[10px] text-brand-cyan font-medium">18.5 Hrs Air Time</div>
+                    </div>
+
+                    <div class="p-2 border-l border-slate-800/80">
+                        <div class="text-[10px] text-slate-400 uppercase font-semibold">Last Flight</div>
+                        <div id="kpi-last-date" class="text-base font-bold text-white mt-0.5">Sep 18, 2026</div>
+                        <div class="text-[10px] text-brand-emerald font-medium"><i class="fa-solid fa-cloud-sun mr-1"></i> Clear</div>
+                    </div>
+
+                    <div class="p-2 border-l border-slate-800/80">
+                        <div class="text-[10px] text-slate-400 uppercase font-semibold">3D Models</div>
+                        <div id="kpi-polycam-count" class="text-base font-bold text-orange-400 mt-0.5 flex items-center gap-1">
+                            <i class="fa-solid fa-cube text-xs"></i> 3 Polycam
+                        </div>
+                        <div class="text-[10px] text-slate-400">Photogrammetry</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Controls & Filtering Row -->
+        <section class="space-y-4">
+            
+            <!-- Type Tabs -->
+            <div class="flex flex-wrap items-center gap-2 border-b border-slate-800/80 pb-3">
+                <button onclick="setTab('ALL')" id="tab-ALL" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-brand-500 text-slate-950 shadow-md">
+                    <i class="fa-solid fa-border-all"></i>
+                    <span>All Deliverables</span>
+                    <span id="badge-count-all" class="bg-slate-950/20 px-2 py-0.5 rounded-md text-[10px]">0</span>
+                </button>
+
+                <button onclick="setTab('POLYCAM')" id="tab-POLYCAM" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800">
+                    <i class="fa-solid fa-cube text-orange-400"></i>
+                    <span>3D Polycam Embeds</span>
+                    <span id="badge-count-polycam" class="bg-slate-800 px-2 py-0.5 rounded-md text-[10px] text-slate-300">0</span>
+                </button>
+
+                <button onclick="setTab('VIDEO')" id="tab-VIDEO" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800">
+                    <i class="fa-solid fa-video text-rose-400"></i>
+                    <span>4K Site Videos</span>
+                    <span id="badge-count-video" class="bg-slate-800 px-2 py-0.5 rounded-md text-[10px] text-slate-300">0</span>
+                </button>
+
+                <button onclick="setTab('PHOTO')" id="tab-PHOTO" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800">
+                    <i class="fa-solid fa-camera text-brand-cyan"></i>
+                    <span>High-Res Aerial Photos</span>
+                    <span id="badge-count-photo" class="bg-slate-800 px-2 py-0.5 rounded-md text-[10px] text-slate-300">0</span>
+                </button>
+            </div>
+
+            <!-- Search Bar & Phase Filters -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center bg-slate-900/80 p-3.5 rounded-2xl border border-slate-800">
+                <!-- Search Input -->
+                <div class="md:col-span-5 relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                    <input type="text" id="search-input" onkeyup="applyFilters()" placeholder="Search title, phase, milestone (e.g. Facade, Foundation)..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500">
+                </div>
+
+                <!-- Phase Timeline Filter -->
+                <div class="md:col-span-4">
+                    <select id="phase-filter" onchange="applyFilters()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500 cursor-pointer">
+                        <option value="ALL">All Construction Phases</option>
+                        <option value="Foundation">Phase 1: Foundation & Excavation</option>
+                        <option value="Framing">Phase 2: Framing & Structural</option>
+                        <option value="Facade">Phase 3: Exterior Facade & Glazing</option>
+                        <option value="Interior">Phase 4: Interior & MEP</option>
+                        <option value="Roof">Phase 5: Roofing & Canopy</option>
+                        <option value="Landscaping">Phase 6: Landscaping & Pools</option>
+                    </select>
+                </div>
+
+                <!-- Action Toolbar for Share/Clear -->
+                <div class="md:col-span-3 flex items-center justify-end gap-2">
+                    <button onclick="shareFilteredURL()" class="w-full py-2 bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition" title="Share current filtered view">
+                        <i class="fa-solid fa-share-nodes text-brand-500"></i>
+                        <span>Share View URL</span>
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Deliverables Grid Container -->
+        <section id="deliverables-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <!-- Dynamic Cards inserted via JS -->
+        </section>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-16 px-4 bg-slate-900/30 rounded-3xl border border-dashed border-slate-800">
+            <div class="w-14 h-14 bg-slate-800/80 rounded-2xl flex items-center justify-center mx-auto text-slate-500 text-xl mb-3">
+                <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-200 mb-1">No Construction Deliverables Match Criteria</h3>
+            <p class="text-slate-400 text-xs max-w-sm mx-auto mb-4">Try clearing your filters or changing search keywords to view site media.</p>
+            <button onclick="resetFilters()" class="px-4 py-2 bg-brand-500/10 border border-brand-500/30 text-brand-500 hover:bg-brand-500/20 rounded-xl text-xs font-bold transition">
+                Reset All Filters
+            </button>
+        </div>
+
+    </main>
+
+    <!-- INTERACTIVE MEDIA PREVIEW MODAL -->
+    <div id="media-modal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-5xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto">
+            
+            <!-- Modal Header -->
+            <div class="px-5 py-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-950/90">
+                <div class="flex items-center gap-3">
+                    <div id="modal-type-badge" class="w-9 h-9 rounded-xl bg-brand-500/20 text-brand-500 flex items-center justify-center text-base font-bold">
+                        <i class="fa-solid fa-cube"></i>
+                    </div>
+                    <div>
+                        <h3 id="modal-title" class="text-sm sm:text-base font-extrabold text-white leading-tight">Deliverable Preview</h3>
+                        <p id="modal-subtitle" class="text-xs text-brand-cyan font-semibold">Grand Vista Resort Construction</p>
+                    </div>
+                </div>
+                <button onclick="closeMediaModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-5 overflow-y-auto flex-grow space-y-4">
+                
+                <!-- Viewer Canvas Container -->
+                <div id="modal-viewer-container" class="aspect-video w-full rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center relative shadow-inner">
+                    <!-- Dynamic iframe or img loaded here -->
+                </div>
+
+                <!-- Info Badges -->
+                <div class="flex flex-wrap items-center gap-3 text-xs bg-slate-950/60 p-3.5 rounded-2xl border border-slate-800/80">
+                    <div class="flex items-center gap-1.5 text-slate-300">
+                        <i class="fa-regular fa-calendar text-brand-500"></i>
+                        <span id="modal-date">Date</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-slate-300">
+                        <i class="fa-solid fa-layer-group text-brand-cyan"></i>
+                        <span id="modal-phase">Phase</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-slate-300">
+                        <i class="fa-solid fa-hard-hat text-amber-400"></i>
+                        <span id="modal-type">Type</span>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div>
+                    <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Flight Observations & Notes</h4>
+                    <p id="modal-description" class="text-xs text-slate-300 leading-relaxed bg-slate-950/40 p-3 rounded-xl border border-slate-800/60">
+                        Flight notes...
+                    </p>
+                </div>
+
+                <!-- Cloud Files External Links -->
+                <div>
+                    <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Cloud Storage & Full-Res Deliverables</h4>
+                    <div id="modal-external-links" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <!-- Links inserted dynamically -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-5 py-3.5 bg-slate-950 border-t border-slate-800 flex items-center justify-between">
+                <button id="modal-copy-link-btn" onclick="" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl flex items-center gap-2 transition">
+                    <i class="fa-regular fa-copy text-brand-500"></i>
+                    <span>Copy External Link</span>
+                </button>
+                <button onclick="closeMediaModal()" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold text-xs rounded-xl transition">
+                    Close Preview
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ADMIN PASSWORD AUTH MODAL -->
+    <div id="admin-auth-modal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl relative text-center space-y-4">
+            <button onclick="closeAdminAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="w-12 h-12 rounded-2xl bg-brand-500/10 text-brand-500 border border-brand-500/20 flex items-center justify-center text-xl mx-auto">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div>
+                <h3 class="text-base font-bold text-white">Admin Authentication</h3>
+                <p class="text-xs text-slate-400 mt-0.5">Enter passcode to manage hotel drone deliverables.</p>
+            </div>
+
+            <form onsubmit="verifyAdminPasscode(event)" class="space-y-3">
+                <div>
+                    <input type="password" id="admin-passcode-input" required placeholder="Enter Passcode (default: admin123)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-center text-white focus:outline-none focus:border-brand-500 tracking-widest">
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold text-xs rounded-xl transition shadow-lg">
+                    Unlock Admin Panel
+                </button>
+            </form>
+            <p class="text-[10px] text-slate-500">Passcode can be changed inside admin settings.</p>
+        </div>
+    </div>
+
+    <!-- ADMIN DASHBOARD PANEL MODAL -->
+    <div id="admin-dashboard-modal" class="fixed inset-0 z-50 hidden bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto">
+            
+            <!-- Admin Header -->
+            <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-brand-500 text-slate-950 flex items-center justify-center font-black">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-extrabold text-white">Deliverable Management Console</h3>
+                        <p class="text-xs text-slate-400">Add, edit, or delete Polycam 3D models and drone media.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="lockAdminSession()" class="px-3 py-1.5 bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500/20 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-lock"></i> Lock
+                    </button>
+                    <button onclick="closeAdminDashboard()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-6">
+
+                <!-- Add/Edit Form -->
+                <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <h4 id="admin-form-title" class="text-xs font-bold uppercase tracking-wider text-brand-500 flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Add New Hotel Deliverable
+                        </h4>
+                        <button id="admin-cancel-edit-btn" onclick="resetAdminForm()" class="hidden text-[11px] text-slate-400 hover:text-white underline">
+                            Cancel Editing
+                        </button>
+                    </div>
+
+                    <form id="admin-deliverable-form" onsubmit="handleAdminFormSubmit(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <input type="hidden" id="form-edit-id" value="">
+
+                        <div>
+                            <label class="block font-semibold text-slate-300 mb-1">Title *</label>
+                            <input type="text" id="form-title" required placeholder="e.g. Roof Structure Polycam 3D Scan" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-brand-500 focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block font-semibold text-slate-300 mb-1">Type *</label>
+                            <select id="form-type" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-brand-500 focus:outline-none">
+                                <option value="POLYCAM">3D Polycam Embed</option>
+                                <option value="VIDEO">4K Site Video</option>
+                                <option value="PHOTO">High-Res Photo / Map</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block font-semibold text-slate-300 mb-1">Construction Phase *</label>
+                            <select id="form-phase" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-brand-500 focus:outline-none">
+                                <option value="Foundation">Phase 1: Foundation & Excavation</option>
+                                <option value="Framing">Phase 2: Framing & Structural</option>
+                                <option value="Facade">Phase 3: Exterior Facade & Glazing</option>
+                                <option value="Interior">Phase 4: Interior & MEP</option>
+                                <option value="Roof">Phase 5: Roofing & Canopy</option>
+                                <option value="Landscaping">Phase 6: Landscaping & Pools</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block font-semibold text-slate-300 mb-1">Flight Survey Date *</label>
+                            <input type="date" id="form-date" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-brand-500 focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block font-semibold text-slate-300 mb-1">Cover Thumbnail Image URL</label>
+                            <input type="url" id="form-thumb" placeholder="https://images.unsplash.com/..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-brand-500 focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block font-semibold text-slate-300 mb-1">Embed URL (Polycam / YouTube / Direct)</label>
+                            <input type="text" id="form-embed" placeholder="https://poly.cam/capture/embed/..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-brand-500 focus:outline-none">
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block font-semibold text-slate-300 mb-1">External High-Res Cloud Link (Google Drive / Dropbox)</label>
+                            <input type="url" id="form-drive" placeholder="https://drive.google.com/drive/folders/..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-brand-500 focus:outline-none">
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block font-semibold text-slate-300 mb-1">Survey Notes & Observations</label>
+                            <textarea id="form-notes" rows="2" placeholder="Detail flight parameters, GSD, mesh density, or site observations." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-brand-500 focus:outline-none"></textarea>
+                        </div>
+
+                        <div class="sm:col-span-2 flex justify-end gap-2 pt-2">
+                            <button type="submit" id="form-submit-btn" class="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-slate-950 font-extrabold rounded-xl transition shadow-md">
+                                Save Deliverable
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Existing Items Table -->
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Current Site Deliverables List</h4>
+                    <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-300">
+                                <thead class="bg-slate-900 text-slate-400 font-semibold border-b border-slate-800">
+                                    <tr>
+                                        <th class="p-3">Deliverable</th>
+                                        <th class="p-3">Type</th>
+                                        <th class="p-3">Phase</th>
+                                        <th class="p-3">Date</th>
+                                        <th class="p-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-table-body" class="divide-y divide-slate-800/60">
+                                    <!-- Table Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Security Settings -->
+                <div class="bg-slate-950/60 p-4 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 class="text-xs font-bold text-slate-300"><i class="fa-solid fa-key text-brand-500 mr-1"></i> Change Admin Passcode</h4>
+                    <div class="flex gap-2">
+                        <input type="password" id="new-passcode-input" placeholder="New passcode" class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
+                        <button onclick="updateAdminPasscode()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition">
+                            Update Passcode
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE CONFIG MODAL -->
+    <div id="config-modal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl relative space-y-4">
+            <button onclick="closeConfigModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-white">Firebase Realtime DB Settings</h3>
+                    <p class="text-xs text-slate-400">Connect your Firebase database for cloud sync across devices.</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1">Firebase Database URL (Realtime DB REST)</label>
+                    <input type="text" id="cfg-firebase-url" placeholder="https://your-project-default-rtdb.firebaseio.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brand-500 font-mono text-[11px]">
+                    <p class="text-[10px] text-slate-500 mt-1">If empty, the app seamlessly falls back to LocalStorage with demo hotel data.</p>
+                </div>
+
+                <div class="flex items-center justify-between pt-2">
+                    <button onclick="clearFirebaseConfig()" class="text-rose-400 hover:underline text-xs font-semibold">
+                        Reset Config
+                    </button>
+                    <button onclick="saveFirebaseConfig()" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold rounded-xl transition">
+                        Save & Sync Database
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // INITIAL DUMMY HOTEL CONSTRUCTION DELIVERABLES
+        const defaultHotelDeliverables = [
+            {
+                id: "hotel-scan-01",
+                title: "Resort Tower Exterior Facade & Glazing Scan",
+                type: "POLYCAM",
+                phase: "Facade",
+                date: "2026-09-18",
+                thumbnail: "https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=800&q=80",
+                embedUrl: "https://poly.cam/capture/00000000-0000-0000-0000-000000000000",
+                driveUrl: "https://drive.google.com",
+                notes: "High-density 3D photogrammetry mesh captured via orbital drone pass. Shows glass curtain wall installation and top deck canopy structural steel."
+            },
+            {
+                id: "hotel-vid-02",
+                title: "4K Flythrough & Pool Deck Progress Reel",
+                type: "VIDEO",
+                phase: "Landscaping",
+                date: "2026-09-12",
+                thumbnail: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=800&q=80",
+                embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                driveUrl: "https://drive.google.com",
+                notes: "Comprehensive 4K drone video reel detailing the resort pool deck layout, rooftop bar steel framing, and perimeter wall completion."
+            },
+            {
+                id: "hotel-photo-03",
+                title: "Full Site Orthomosaic & High-Res Aerial Map",
+                type: "PHOTO",
+                phase: "Framing",
+                date: "2026-09-05",
+                thumbnail: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
+                embedUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80",
+                driveUrl: "https://drive.google.com",
+                notes: "2.1 cm/px ground sampling distance orthophoto map covering all 12 acres of the hotel property. Color-balanced and georeferenced."
+            },
+            {
+                id: "hotel-scan-04",
+                title: "East Wing Concrete Slab & Level 4 Floor Scan",
+                type: "POLYCAM",
+                phase: "Framing",
+                date: "2026-08-22",
+                thumbnail: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
+                embedUrl: "https://poly.cam/capture/00000000-0000-0000-0000-000000000000",
+                driveUrl: "https://drive.google.com",
+                notes: "Interactive Polycam 3D scan of Level 4 poured post-tension concrete floor slab prior to interior wall framing layout."
+            },
+            {
+                id: "hotel-vid-05",
+                title: "Main Ballroom Roof Superstructure Weld Inspection",
+                type: "VIDEO",
+                phase: "Roof",
+                date: "2026-08-10",
+                thumbnail: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+                embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                driveUrl: "https://drive.google.com",
+                notes: "Close-up drone inspection video showcasing structural steel joint welds and crane operations on the main ballroom roof superstructure."
+            },
+            {
+                id: "hotel-scan-06",
+                title: "Foundation Excavation & Volumetric Earthwork Scan",
+                type: "POLYCAM",
+                phase: "Foundation",
+                date: "2026-06-15",
+                thumbnail: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=800&q=80",
+                embedUrl: "https://poly.cam/capture/00000000-0000-0000-0000-000000000000",
+                driveUrl: "https://drive.google.com",
+                notes: "Initial foundation excavation aerial photography survey. Includes volumetric earthwork analysis report."
+            }
+        ];
+
+        // STATE VARIABLES
+        let deliverables = [];
+        let activeTab = 'ALL';
+        let isAdminLoggedIn = false;
+        let firebaseDbUrl = localStorage.getItem('mattsshop_firebase_url') || '';
+        let adminPasscode = localStorage.getItem('mattsshop_admin_passcode') || 'admin123';
+
+        // APPLICATION INITIALIZATION
+        window.onload = function() {
+            initDatabase();
+            checkHashParams();
+            setupEventListeners();
+        };
+
+        function initDatabase() {
+            if (firebaseDbUrl) {
+                document.getElementById('db-status-badge').innerHTML = `
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Firebase Realtime DB
+                `;
+                fetchFromFirebase();
+            } else {
+                document.getElementById('db-status-badge').innerHTML = `
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> LocalStorage Mode
+                `;
+                const localData = localStorage.getItem('mattsshop_hotel_deliverables');
+                if (localData) {
+                    try {
+                        deliverables = JSON.parse(localData);
+                    } catch(e) {
+                        deliverables = defaultHotelDeliverables;
+                    }
+                } else {
+                    deliverables = [...defaultHotelDeliverables];
+                    saveToLocalStorage();
+                }
+                refreshUI();
+            }
+        }
+
+        // FIREBASE REST DB OPERATIONS
+        async function fetchFromFirebase() {
+            try {
+                const response = await fetch(`${firebaseDbUrl.replace(/\/$/, '')}/hotel_deliverables.json`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data) {
+                        deliverables = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                    } else {
+                        deliverables = [...defaultHotelDeliverables];
+                        saveToFirebaseAll();
+                    }
+                    refreshUI();
+                } else {
+                    throw new Error("Failed to fetch Firebase");
+                }
+            } catch (err) {
+                showToast("Firebase fetch failed. Using LocalStorage fallback.");
+                const localData = localStorage.getItem('mattsshop_hotel_deliverables');
+                deliverables = localData ? JSON.parse(localData) : defaultHotelDeliverables;
+                refreshUI();
+            }
+        }
+
+        async function saveToFirebaseItem(item) {
+            if (!firebaseDbUrl) return;
+            try {
+                await fetch(`${firebaseDbUrl.replace(/\/$/, '')}/hotel_deliverables/${item.id}.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(item)
+                });
+            } catch(e) {
+                console.error("Firebase sync error", e);
+            }
+        }
+
+        async function deleteFromFirebaseItem(id) {
+            if (!firebaseDbUrl) return;
+            try {
+                await fetch(`${firebaseDbUrl.replace(/\/$/, '')}/hotel_deliverables/${id}.json`, {
+                    method: 'DELETE'
+                });
+            } catch(e) {
+                console.error("Firebase delete error", e);
+            }
+        }
+
+        async function saveToFirebaseAll() {
+            if (!firebaseDbUrl) return;
+            const objData = {};
+            deliverables.forEach(item => { objData[item.id] = item; });
+            try {
+                await fetch(`${firebaseDbUrl.replace(/\/$/, '')}/hotel_deliverables.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(objData)
+                });
+            } catch(e) {
+                console.error("Firebase save all error", e);
+            }
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('mattsshop_hotel_deliverables', JSON.stringify(deliverables));
+        }
+
+        // REFRESH & RENDER
+        function refreshUI() {
+            updateKpis();
+            updateTabCounts();
+            applyFilters();
+            if (isAdminLoggedIn) {
+                renderAdminTable();
+            }
+        }
+
+        function updateKpis() {
+            const polycamCount = deliverables.filter(d => d.type === 'POLYCAM').length;
+            document.getElementById('kpi-polycam-count').innerHTML = `<i class="fa-solid fa-cube text-xs"></i> ${polycamCount} Polycam`;
+            document.getElementById('kpi-flights').textContent = `${deliverables.length * 4} Flights`;
+            
+            if (deliverables.length > 0) {
+                const sortedDates = deliverables.map(d => d.date).sort().reverse();
+                document.getElementById('kpi-last-date').textContent = sortedDates[0];
+            }
+        }
+
+        function updateTabCounts() {
+            document.getElementById('badge-count-all').textContent = deliverables.length;
+            document.getElementById('badge-count-polycam').textContent = deliverables.filter(d => d.type === 'POLYCAM').length;
+            document.getElementById('badge-count-video').textContent = deliverables.filter(d => d.type === 'VIDEO').length;
+            document.getElementById('badge-count-photo').textContent = deliverables.filter(d => d.type === 'PHOTO').length;
+        }
+
+        function setTab(tab) {
+            activeTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = 'tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800';
+            });
+
+            const activeBtn = document.getElementById(`tab-${tab}`);
+            if (activeBtn) {
+                activeBtn.className = 'tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-brand-500 text-slate-950 shadow-md';
+            }
+
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const searchQuery = document.getElementById('search-input').value.toLowerCase();
+            const phaseQuery = document.getElementById('phase-filter').value;
+
+            const filtered = deliverables.filter(item => {
+                const matchesTab = activeTab === 'ALL' || item.type === activeTab;
+                const matchesSearch = item.title.toLowerCase().includes(searchQuery) ||
+                                      (item.notes && item.notes.toLowerCase().includes(searchQuery)) ||
+                                      item.phase.toLowerCase().includes(searchQuery);
+                const matchesPhase = phaseQuery === 'ALL' || item.phase === phaseQuery;
+
+                return matchesTab && matchesSearch && matchesPhase;
+            });
+
+            renderGrid(filtered);
+        }
+
+        function renderGrid(items) {
+            const grid = document.getElementById('deliverables-grid');
+            const emptyState = document.getElementById('empty-state');
+            grid.innerHTML = '';
+
+            if (items.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            grid.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            items.forEach(item => {
+                let badgeClass = "bg-slate-800 text-slate-300";
+                let typeIcon = "fa-camera";
+                let typeLabel = "Photo";
+
+                if (item.type === 'POLYCAM') {
+                    badgeClass = "polycam-gradient text-white font-black";
+                    typeIcon = "fa-cube";
+                    typeLabel = "3D Polycam Embed";
+                } else if (item.type === 'VIDEO') {
+                    badgeClass = "bg-rose-500/10 text-rose-400 border border-rose-500/30";
+                    typeIcon = "fa-video";
+                    typeLabel = "4K Site Video";
+                } else if (item.type === 'PHOTO') {
+                    badgeClass = "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30";
+                    typeIcon = "fa-camera";
+                    typeLabel = "High-Res Aerial Photo";
+                }
+
+                const cardHtml = `
+                    <div class="bg-slate-900 border border-slate-800/90 rounded-2xl overflow-hidden shadow-xl hover:border-slate-700 transition-all duration-300 flex flex-col group">
+                        
+                        <!-- Thumbnail Header -->
+                        <div class="relative h-48 bg-slate-950 overflow-hidden cursor-pointer" onclick="openMediaModal('${item.id}')">
+                            <img src="${item.thumbnail || 'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=800&q=80'}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-black/20"></div>
+
+                            <!-- Type Badge -->
+                            <div class="absolute top-3 left-3">
+                                <span class="${badgeClass} text-[10px] px-2.5 py-1 rounded-lg font-bold shadow-md flex items-center gap-1">
+                                    <i class="fa-solid ${typeIcon}"></i> ${typeLabel}
+                                </span>
+                            </div>
+
+                            <!-- Date Badge -->
+                            <div class="absolute top-3 right-3">
+                                <span class="bg-slate-950/80 backdrop-blur-md text-slate-300 text-[10px] px-2 py-0.5 rounded-md font-mono border border-slate-800">
+                                    ${item.date}
+                                </span>
+                            </div>
+
+                            <!-- Interactive Launch Badge Overlay -->
+                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-slate-950/50 backdrop-blur-[2px]">
+                                <span class="px-4 py-2 bg-brand-500 text-slate-950 font-black text-xs rounded-xl shadow-lg flex items-center gap-1.5">
+                                    <i class="fa-solid fa-expand"></i> Launch Interactive Viewer
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Card Content -->
+                        <div class="p-4 flex-grow flex flex-col justify-between space-y-3">
+                            <div>
+                                <div class="text-[10px] font-bold text-brand-cyan uppercase tracking-wider mb-1">
+                                    <i class="fa-solid fa-layer-group text-[9px] mr-1"></i> Phase: ${item.phase}
+                                </div>
+                                <h3 class="text-sm font-extrabold text-white group-hover:text-brand-500 transition cursor-pointer line-clamp-2" onclick="openMediaModal('${item.id}')">
+                                    ${item.title}
+                                </h3>
+                                <p class="text-slate-400 text-xs mt-1.5 line-clamp-2 leading-relaxed">
+                                    ${item.notes || 'No notes attached to this mission.'}
+                                </p>
+                            </div>
+
+                            <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2">
+                                <button onclick="openMediaModal('${item.id}')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-play text-brand-500"></i> Open Deliverable
+                                </button>
+                                <button onclick="copyToClipboard('${item.driveUrl || item.embedUrl}')" class="p-2 bg-slate-950 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 rounded-xl transition" title="Copy External Link">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                `;
+                grid.innerHTML += cardHtml;
+            });
+        }
+
+        // MEDIA MODAL VIEWER
+        function openMediaModal(id) {
+            const item = deliverables.find(d => d.id === id);
+            if (!item) return;
+
+            document.getElementById('modal-title').textContent = item.title;
+            document.getElementById('modal-date').textContent = item.date;
+            document.getElementById('modal-phase').textContent = `Phase: ${item.phase}`;
+            document.getElementById('modal-type').textContent = item.type;
+            document.getElementById('modal-description').textContent = item.notes || "No notes attached.";
+
+            const viewerContainer = document.getElementById('modal-viewer-container');
+
+            if (item.type === 'POLYCAM') {
+                viewerContainer.innerHTML = `
+                    <div class="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-center p-6 relative">
+                        <div class="w-16 h-16 rounded-2xl polycam-gradient text-white flex items-center justify-center text-2xl font-black mb-3 shadow-lg">
+                            <i class="fa-solid fa-cube"></i>
+                        </div>
+                        <h4 class="text-base font-bold text-white mb-1">Polycam 3D Photogrammetry Scan</h4>
+                        <p class="text-xs text-slate-400 max-w-md mb-4">Interactive 3D Point Cloud & Mesh captured via LiDAR Drone Pass.</p>
+                        <a href="${item.embedUrl || 'https://poly.cam'}" target="_blank" class="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-xs rounded-xl flex items-center gap-2 shadow-lg transition">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live Interactive Polycam 3D Model
+                        </a>
+                    </div>
+                `;
+            } else if (item.type === 'VIDEO') {
+                viewerContainer.innerHTML = `
+                    <iframe src="${item.embedUrl || 'https://www.youtube.com/embed/dQw4w9WgXcQ'}" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                `;
+            } else if (item.type === 'PHOTO') {
+                viewerContainer.innerHTML = `
+                    <img src="${item.embedUrl || item.thumbnail}" class="w-full h-full object-contain bg-slate-950" alt="High Res Photo">
+                `;
+            }
+
+            // Populate External Cloud Storage Links
+            const linksGrid = document.getElementById('modal-external-links');
+            linksGrid.innerHTML = '';
+
+            if (item.driveUrl) {
+                linksGrid.innerHTML += `
+                    <a href="${item.driveUrl}" target="_blank" class="p-3 bg-blue-600/10 hover:bg-blue-600/20 border border-blue-500/30 text-blue-400 rounded-xl text-xs font-semibold flex items-center justify-between transition">
+                        <span class="flex items-center gap-2"><i class="fa-brands fa-google-drive text-sm"></i> Full-Res Google Drive / Cloud Folder</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                `;
+            }
+
+            document.getElementById('modal-copy-link-btn').onclick = () => copyToClipboard(item.driveUrl || item.embedUrl);
+            document.getElementById('media-modal').classList.remove('hidden');
+        }
+
+        function closeMediaModal() {
+            document.getElementById('media-modal').classList.add('hidden');
+            document.getElementById('modal-viewer-container').innerHTML = '';
+        }
+
+        // ADMIN ACCESS & SECURITY LOGIC
+        function openAdminAuthOrPanel() {
+            if (isAdminLoggedIn) {
+                openAdminDashboard();
+            } else {
+                document.getElementById('admin-auth-modal').classList.remove('hidden');
+            }
+        }
+
+        function closeAdminAuthModal() {
+            document.getElementById('admin-auth-modal').classList.add('hidden');
+        }
+
+        function verifyAdminPasscode(e) {
+            e.preventDefault();
+            const inputVal = document.getElementById('admin-passcode-input').value;
+            if (inputVal === adminPasscode) {
+                isAdminLoggedIn = true;
+                closeAdminAuthModal();
+                updateAdminBadgeUI();
+                openAdminDashboard();
+                showToast("Admin access unlocked!");
+            } else {
+                showToast("Invalid passcode! Try default: admin123");
+            }
+        }
+
+        function updateAdminBadgeUI() {
+            const icon = document.getElementById('admin-lock-icon');
+            const text = document.getElementById('admin-btn-text');
+            if (isAdminLoggedIn) {
+                icon.className = "fa-solid fa-unlock text-emerald-400";
+                text.textContent = "Admin Active";
+            } else {
+                icon.className = "fa-solid fa-lock text-brand-500";
+                text.textContent = "Admin Access";
+            }
+        }
+
+        function lockAdminSession() {
+            isAdminLoggedIn = false;
+            updateAdminBadgeUI();
+            closeAdminDashboard();
+            showToast("Admin session locked.");
+        }
+
+        function openAdminDashboard() {
+            renderAdminTable();
+            document.getElementById('admin-dashboard-modal').classList.remove('hidden');
+        }
+
+        function closeAdminDashboard() {
+            document.getElementById('admin-dashboard-modal').classList.add('hidden');
+        }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById('admin-table-body');
+            tbody.innerHTML = '';
+
+            deliverables.forEach(item => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-900/50 transition">
+                        <td class="p-3 font-semibold text-white">${item.title}</td>
+                        <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-800 text-[10px] font-bold">${item.type}</span></td>
+                        <td class="p-3 text-slate-400">${item.phase}</td>
+                        <td class="p-3 font-mono text-[11px] text-slate-400">${item.date}</td>
+                        <td class="p-3 text-right space-x-1">
+                            <button onclick="editDeliverable('${item.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-brand-500 rounded-lg font-bold transition">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="deleteDeliverable('${item.id}')" class="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-lg font-bold transition">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function handleAdminFormSubmit(e) {
+            e.preventDefault();
+            const editId = document.getElementById('form-edit-id').value;
+
+            const itemData = {
+                id: editId || ("hotel-" + Date.now()),
+                title: document.getElementById('form-title').value,
+                type: document.getElementById('form-type').value,
+                phase: document.getElementById('form-phase').value,
+                date: document.getElementById('form-date').value,
+                thumbnail: document.getElementById('form-thumb').value || "https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=800&q=80",
+                embedUrl: document.getElementById('form-embed').value,
+                driveUrl: document.getElementById('form-drive').value,
+                notes: document.getElementById('form-notes').value
+            };
+
+            if (editId) {
+                const idx = deliverables.findIndex(d => d.id === editId);
+                if (idx !== -1) deliverables[idx] = itemData;
+            } else {
+                deliverables.unshift(itemData);
+            }
+
+            saveToLocalStorage();
+            saveToFirebaseItem(itemData);
+            refreshUI();
+            resetAdminForm();
+            showToast(editId ? "Deliverable updated!" : "New deliverable added!");
+        }
+
+        function editDeliverable(id) {
+            const item = deliverables.find(d => d.id === id);
+            if (!item) return;
+
+            document.getElementById('form-edit-id').value = item.id;
+            document.getElementById('form-title').value = item.title;
+            document.getElementById('form-type').value = item.type;
+            document.getElementById('form-phase').value = item.phase;
+            document.getElementById('form-date').value = item.date;
+            document.getElementById('form-thumb').value = item.thumbnail || '';
+            document.getElementById('form-embed').value = item.embedUrl || '';
+            document.getElementById('form-drive').value = item.driveUrl || '';
+            document.getElementById('form-notes').value = item.notes || '';
+
+            document.getElementById('admin-form-title').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Edit Deliverable`;
+            document.getElementById('admin-cancel-edit-btn').classList.remove('hidden');
+            document.getElementById('form-submit-btn').textContent = "Update Deliverable";
+        }
+
+        function resetAdminForm() {
+            document.getElementById('admin-deliverable-form').reset();
+            document.getElementById('form-edit-id').value = '';
+            document.getElementById('admin-form-title').innerHTML = `<i class="fa-solid fa-plus"></i> Add New Hotel Deliverable`;
+            document.getElementById('admin-cancel-edit-btn').classList.add('hidden');
+            document.getElementById('form-submit-btn').textContent = "Save Deliverable";
+        }
+
+        function deleteDeliverable(id) {
+            if (!confirm("Are you sure you want to delete this deliverable?")) return;
+            deliverables = deliverables.filter(d => d.id !== id);
+            saveToLocalStorage();
+            deleteFromFirebaseItem(id);
+            refreshUI();
+            showToast("Deliverable deleted.");
+        }
+
+        function updateAdminPasscode() {
+            const val = document.getElementById('new-passcode-input').value;
+            if (val && val.length >= 4) {
+                adminPasscode = val;
+                localStorage.setItem('mattsshop_admin_passcode', val);
+                document.getElementById('new-passcode-input').value = '';
+                showToast("Admin passcode updated successfully!");
+            } else {
+                showToast("Passcode must be at least 4 characters.");
+            }
+        }
+
+        // FIREBASE CONFIG MODAL
+        function openConfigModal() {
+            document.getElementById('cfg-firebase-url').value = firebaseDbUrl;
+            document.getElementById('config-modal').classList.remove('hidden');
+        }
+
+        function closeConfigModal() {
+            document.getElementById('config-modal').classList.add('hidden');
+        }
+
+        function saveFirebaseConfig() {
+            const url = document.getElementById('cfg-firebase-url').value.trim();
+            firebaseDbUrl = url;
+            localStorage.setItem('mattsshop_firebase_url', url);
+            closeConfigModal();
+            initDatabase();
+            showToast("Firebase settings saved!");
+        }
+
+        function clearFirebaseConfig() {
+            firebaseDbUrl = '';
+            localStorage.removeItem('mattsshop_firebase_url');
+            closeConfigModal();
+            initDatabase();
+            showToast("Reset to LocalStorage mode.");
+        }
+
+        // HELPER FUNCTIONS
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('phase-filter').value = 'ALL';
+            setTab('ALL');
+        }
+
+        function shareFilteredURL() {
+            const phase = document.getElementById('phase-filter').value;
+            const baseUrl = window.location.href.split('#')[0];
+            const shareUrl = `${baseUrl}#tab=${activeTab}&phase=${phase}`;
+            copyToClipboard(shareUrl);
+        }
+
+        function checkHashParams() {
+            const hash = window.location.hash.substring(1);
+            if (!hash) return;
+            const params = new URLSearchParams(hash);
+            if (params.has('tab')) setTab(params.get('tab'));
+            if (params.has('phase')) {
+                document.getElementById('phase-filter').value = params.get('phase');
+                applyFilters();
+            }
+        }
+
+        function copyToClipboard(text) {
+            const temp = document.createElement("input");
+            temp.value = text || window.location.href;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand("copy");
+            document.body.removeChild(temp);
+            showToast("Link copied to clipboard!");
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.classList.remove('translate-y-[-180%]');
+            setTimeout(() => {
+                toast.classList.add('translate-y-[-180%]');
+            }, 3000);
+        }
+
+        function setupEventListeners() {
+            window.addEventListener('hashchange', checkHashParams);
+        }
+    </script>
+</body>
+</html>
