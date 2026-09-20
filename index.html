@@ -95,12 +95,18 @@
                             <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Local Data Mode
                         </span>
                     </div>
-                    <h1 class="text-sm sm:text-base font-extrabold text-white tracking-tight">Grand Vista Luxury Hotel & Resort</h1>
+                    <h1 id="nav-project-title" class="text-sm sm:text-base font-extrabold text-white tracking-tight">Grand Vista Luxury Hotel & Resort</h1>
                 </div>
             </div>
 
-            <!-- Admin Toggle & Quick Tools -->
+            <!-- Project Switcher & Admin Toggle -->
             <div class="flex items-center gap-2">
+                <div class="relative">
+                    <select id="project-switcher" onchange="switchProject(this.value)" class="appearance-none bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 hover:border-brand-500/50 rounded-xl pl-3 pr-8 py-2 text-xs font-semibold transition shadow-sm focus:outline-none focus:border-brand-500 cursor-pointer max-w-[160px] sm:max-w-[220px]">
+                        <!-- Project options injected via JS -->
+                    </select>
+                    <i class="fa-solid fa-chevron-down absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-[10px] pointer-events-none"></i>
+                </div>
                 <button id="admin-badge-btn" onclick="openAdminAuthOrPanel()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 hover:border-brand-500/50 rounded-xl text-xs font-semibold flex items-center gap-2 transition shadow-sm">
                     <i id="admin-lock-icon" class="fa-solid fa-lock text-brand-500"></i>
                     <span id="admin-btn-text" class="hidden sm:inline">Admin Access</span>
@@ -128,14 +134,14 @@
                             ACTIVE CONSTRUCTION SITE
                         </span>
                         <span class="bg-slate-800/90 text-slate-300 text-xs px-3 py-1 rounded-full border border-slate-700">
-                            <i class="fa-solid fa-location-dot text-brand-cyan mr-1"></i> Austin Lakefront Site
+                            <i class="fa-solid fa-location-dot text-brand-cyan mr-1"></i> <span id="project-location">Austin Lakefront Site</span>
                         </span>
                         <span class="bg-slate-800/90 text-slate-400 text-xs px-3 py-1 rounded-full border border-slate-700 font-mono">
                             Host: mattsshop.com
                         </span>
                     </div>
-                    <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Grand Vista Resort Construction Surveillance</h2>
-                    <p class="text-xs sm:text-sm text-slate-400 mt-1.5 max-w-2xl leading-relaxed">
+                    <h2 id="project-title" class="text-2xl sm:text-3xl font-black text-white tracking-tight">Grand Vista Resort Construction Surveillance</h2>
+                    <p id="project-description" class="text-xs sm:text-sm text-slate-400 mt-1.5 max-w-2xl leading-relaxed">
                         Weekly drone mission deliverables: 4K aerial flythroughs, orthomosaic aerial mapping, and high-precision 3D Polycam laser & photogrammetry models.
                     </p>
                 </div>
@@ -145,8 +151,8 @@
                     <div class="p-2">
                         <div class="text-[10px] text-slate-400 uppercase font-semibold">Project Progress</div>
                         <div id="kpi-progress" class="text-xl font-black text-brand-500 mt-0.5 flex items-baseline gap-1">
-                            <span>68%</span>
-                            <span class="text-[9px] text-slate-500 font-normal">Phase 3</span>
+                            <span id="kpi-progress-pct">68%</span>
+                            <span id="kpi-phase-label" class="text-[9px] text-slate-500 font-normal">Phase 3</span>
                         </div>
                         <div class="w-full bg-slate-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
                             <div id="kpi-progress-bar" class="bg-brand-500 h-full rounded-full" style="width: 68%;"></div>
@@ -388,6 +394,58 @@
 
             <div class="p-6 overflow-y-auto space-y-6">
 
+                <!-- Manage Projects -->
+                <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <h4 id="project-form-title" class="text-xs font-bold uppercase tracking-wider text-brand-cyan flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Add New Project
+                        </h4>
+                        <button id="project-cancel-edit-btn" onclick="resetProjectForm()" class="hidden text-[11px] text-slate-400 hover:text-white underline">
+                            Cancel Editing
+                        </button>
+                    </div>
+
+                    <form id="admin-project-form" onsubmit="handleProjectFormSubmit(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <input type="hidden" id="proj-form-edit-id" value="">
+
+                        <div class="sm:col-span-2">
+                            <label class="block font-semibold text-slate-300 mb-1">Project Name *</label>
+                            <input type="text" id="proj-form-name" required placeholder="e.g. WoodSpring Suites Cartersville" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-brand-cyan focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block font-semibold text-slate-300 mb-1">Site / Location</label>
+                            <input type="text" id="proj-form-location" placeholder="e.g. Cartersville, GA Site" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-brand-cyan focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block font-semibold text-slate-300 mb-1">Current Phase Label</label>
+                            <input type="text" id="proj-form-phase" placeholder="e.g. Phase 2" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-brand-cyan focus:outline-none">
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block font-semibold text-slate-300 mb-1">Progress % (0-100)</label>
+                            <input type="number" id="proj-form-progress" min="0" max="100" placeholder="e.g. 45" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-brand-cyan focus:outline-none">
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block font-semibold text-slate-300 mb-1">Description</label>
+                            <textarea id="proj-form-description" rows="2" placeholder="Short description shown under the project title." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-brand-cyan focus:outline-none"></textarea>
+                        </div>
+
+                        <div class="sm:col-span-2 flex justify-end gap-2 pt-2">
+                            <button type="submit" id="project-form-submit-btn" class="px-5 py-2 bg-brand-cyan hover:opacity-90 text-slate-950 font-extrabold rounded-xl transition shadow-md">
+                                Save Project
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="space-y-2 pt-2 border-t border-slate-800">
+                        <h5 class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Existing Projects</h5>
+                        <div id="admin-projects-list" class="space-y-1.5"></div>
+                    </div>
+                </div>
+
                 <!-- Add/Edit Form -->
                 <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
                     <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -401,6 +459,13 @@
 
                     <form id="admin-deliverable-form" onsubmit="handleAdminFormSubmit(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                         <input type="hidden" id="form-edit-id" value="">
+
+                        <div class="sm:col-span-2">
+                            <label class="block font-semibold text-slate-300 mb-1">Project *</label>
+                            <select id="form-project" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-brand-500 focus:outline-none">
+                                <!-- Project options injected via JS -->
+                            </select>
+                        </div>
 
                         <div>
                             <label class="block font-semibold text-slate-300 mb-1">Title *</label>
@@ -463,7 +528,12 @@
 
                 <!-- Existing Items Table -->
                 <div class="space-y-3">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Current Site Deliverables List</h4>
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Deliverables List</h4>
+                        <select id="admin-table-project-filter" onchange="switchProject(this.value); renderAdminTable();" class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-brand-500 cursor-pointer">
+                            <!-- Project options injected via JS -->
+                        </select>
+                    </div>
                     <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs text-slate-300">
@@ -536,10 +606,23 @@
     </div>
 
     <script>
+        // INITIAL DUMMY PROJECTS
+        const defaultProjects = [
+            {
+                id: "grand-vista",
+                name: "Grand Vista Luxury Hotel & Resort",
+                location: "Austin Lakefront Site",
+                phaseLabel: "Phase 3",
+                progress: 68,
+                description: "Weekly drone mission deliverables: 4K aerial flythroughs, orthomosaic aerial mapping, and high-precision 3D Polycam laser & photogrammetry models."
+            }
+        ];
+
         // INITIAL DUMMY HOTEL CONSTRUCTION DELIVERABLES
         const defaultHotelDeliverables = [
             {
                 id: "hotel-scan-01",
+                project: "grand-vista",
                 title: "Resort Tower Exterior Facade & Glazing Scan",
                 type: "POLYCAM",
                 phase: "Facade",
@@ -551,6 +634,7 @@
             },
             {
                 id: "hotel-vid-02",
+                project: "grand-vista",
                 title: "4K Flythrough & Pool Deck Progress Reel",
                 type: "VIDEO",
                 phase: "Landscaping",
@@ -562,6 +646,7 @@
             },
             {
                 id: "hotel-photo-03",
+                project: "grand-vista",
                 title: "Full Site Orthomosaic & High-Res Aerial Map",
                 type: "PHOTO",
                 phase: "Framing",
@@ -573,6 +658,7 @@
             },
             {
                 id: "hotel-scan-04",
+                project: "grand-vista",
                 title: "East Wing Concrete Slab & Level 4 Floor Scan",
                 type: "POLYCAM",
                 phase: "Framing",
@@ -584,6 +670,7 @@
             },
             {
                 id: "hotel-vid-05",
+                project: "grand-vista",
                 title: "Main Ballroom Roof Superstructure Weld Inspection",
                 type: "VIDEO",
                 phase: "Roof",
@@ -595,6 +682,7 @@
             },
             {
                 id: "hotel-scan-06",
+                project: "grand-vista",
                 title: "Foundation Excavation & Volumetric Earthwork Scan",
                 type: "POLYCAM",
                 phase: "Foundation",
@@ -607,7 +695,9 @@
         ];
 
         // STATE VARIABLES
+        let projects = [];
         let deliverables = [];
+        let activeProjectId = null;
         let activeTab = 'ALL';
         let isAdminLoggedIn = false;
         let firebaseDbUrl = localStorage.getItem('mattsshop_firebase_url') || '';
@@ -616,7 +706,6 @@
         // APPLICATION INITIALIZATION
         window.onload = function() {
             initDatabase();
-            checkHashParams();
             setupEventListeners();
         };
 
@@ -630,42 +719,84 @@
                 document.getElementById('db-status-badge').innerHTML = `
                     <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> LocalStorage Mode
                 `;
+                const localProjects = localStorage.getItem('mattsshop_projects');
+                if (localProjects) {
+                    try {
+                        projects = JSON.parse(localProjects);
+                    } catch(e) {
+                        projects = [...defaultProjects];
+                    }
+                } else {
+                    projects = [...defaultProjects];
+                    saveProjectsToLocalStorage();
+                }
+
                 const localData = localStorage.getItem('mattsshop_hotel_deliverables');
                 if (localData) {
                     try {
                         deliverables = JSON.parse(localData);
                     } catch(e) {
-                        deliverables = defaultHotelDeliverables;
+                        deliverables = [...defaultHotelDeliverables];
                     }
                 } else {
                     deliverables = [...defaultHotelDeliverables];
                     saveToLocalStorage();
                 }
-                refreshUI();
+
+                finishInit();
             }
+        }
+
+        // Called once projects + deliverables are loaded, regardless of source
+        function finishInit() {
+            if (!projects || projects.length === 0) {
+                projects = [...defaultProjects];
+            }
+            const hashProject = getHashParam('project');
+            activeProjectId = (hashProject && projects.some(p => p.id === hashProject))
+                ? hashProject
+                : projects[0].id;
+
+            populateProjectSelectors();
+            checkHashParams();
+            refreshUI();
         }
 
         // FIREBASE REST DB OPERATIONS
         async function fetchFromFirebase() {
             try {
-                const response = await fetch(`${firebaseDbUrl.replace(/\/$/, '')}/hotel_deliverables.json`);
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data) {
-                        deliverables = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                const [projRes, delivRes] = await Promise.all([
+                    fetch(`${firebaseDbUrl.replace(/\/$/, '')}/projects.json`),
+                    fetch(`${firebaseDbUrl.replace(/\/$/, '')}/hotel_deliverables.json`)
+                ]);
+                if (projRes.ok && delivRes.ok) {
+                    const projData = await projRes.json();
+                    const delivData = await delivRes.json();
+
+                    if (projData) {
+                        projects = Object.keys(projData).map(key => ({ id: key, ...projData[key] }));
+                    } else {
+                        projects = [...defaultProjects];
+                        saveAllProjectsToFirebase();
+                    }
+
+                    if (delivData) {
+                        deliverables = Object.keys(delivData).map(key => ({ id: key, ...delivData[key] }));
                     } else {
                         deliverables = [...defaultHotelDeliverables];
                         saveToFirebaseAll();
                     }
-                    refreshUI();
+                    finishInit();
                 } else {
                     throw new Error("Failed to fetch Firebase");
                 }
             } catch (err) {
                 showToast("Firebase fetch failed. Using LocalStorage fallback.");
+                const localProjects = localStorage.getItem('mattsshop_projects');
+                projects = localProjects ? JSON.parse(localProjects) : [...defaultProjects];
                 const localData = localStorage.getItem('mattsshop_hotel_deliverables');
-                deliverables = localData ? JSON.parse(localData) : defaultHotelDeliverables;
-                refreshUI();
+                deliverables = localData ? JSON.parse(localData) : [...defaultHotelDeliverables];
+                finishInit();
             }
         }
 
@@ -708,36 +839,146 @@
             }
         }
 
+        async function saveProjectToFirebaseItem(project) {
+            if (!firebaseDbUrl) return;
+            try {
+                await fetch(`${firebaseDbUrl.replace(/\/$/, '')}/projects/${project.id}.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(project)
+                });
+            } catch(e) {
+                console.error("Firebase project sync error", e);
+            }
+        }
+
+        async function deleteProjectFromFirebaseItem(id) {
+            if (!firebaseDbUrl) return;
+            try {
+                await fetch(`${firebaseDbUrl.replace(/\/$/, '')}/projects/${id}.json`, {
+                    method: 'DELETE'
+                });
+            } catch(e) {
+                console.error("Firebase project delete error", e);
+            }
+        }
+
+        async function saveAllProjectsToFirebase() {
+            if (!firebaseDbUrl) return;
+            const objData = {};
+            projects.forEach(p => { objData[p.id] = p; });
+            try {
+                await fetch(`${firebaseDbUrl.replace(/\/$/, '')}/projects.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(objData)
+                });
+            } catch(e) {
+                console.error("Firebase save all projects error", e);
+            }
+        }
+
         function saveToLocalStorage() {
             localStorage.setItem('mattsshop_hotel_deliverables', JSON.stringify(deliverables));
         }
 
+        function saveProjectsToLocalStorage() {
+            localStorage.setItem('mattsshop_projects', JSON.stringify(projects));
+        }
+
         // REFRESH & RENDER
         function refreshUI() {
+            updateProjectBanner();
             updateKpis();
             updateTabCounts();
             applyFilters();
             if (isAdminLoggedIn) {
                 renderAdminTable();
+                renderProjectsAdminList();
+            }
+        }
+
+        // Deliverables belonging to the currently selected project
+        function currentProjectDeliverables() {
+            return deliverables.filter(d => d.project === activeProjectId);
+        }
+
+        function getActiveProject() {
+            return projects.find(p => p.id === activeProjectId) || projects[0];
+        }
+
+        function updateProjectBanner() {
+            const proj = getActiveProject();
+            if (!proj) return;
+            document.getElementById('nav-project-title').textContent = proj.name;
+            document.getElementById('project-title').textContent = proj.name;
+            document.getElementById('project-location').textContent = proj.location || 'Site Location TBD';
+            document.getElementById('project-description').textContent = proj.description || '';
+            document.getElementById('kpi-phase-label').textContent = proj.phaseLabel || '';
+            const pct = (proj.progress === undefined || proj.progress === null || proj.progress === '') ? 0 : proj.progress;
+            document.getElementById('kpi-progress-pct').textContent = `${pct}%`;
+            document.getElementById('kpi-progress-bar').style.width = `${pct}%`;
+            document.title = `${proj.name} - Drone Deliverables Portal`;
+
+            // Keep the header/admin project selectors in sync with the active project
+            const switcher = document.getElementById('project-switcher');
+            if (switcher && switcher.value !== activeProjectId) switcher.value = activeProjectId;
+            const tableFilter = document.getElementById('admin-table-project-filter');
+            if (tableFilter && tableFilter.value !== activeProjectId) tableFilter.value = activeProjectId;
+        }
+
+        function switchProject(projectId) {
+            if (!projects.some(p => p.id === projectId)) return;
+            activeProjectId = projectId;
+            document.getElementById('search-input').value = '';
+            document.getElementById('phase-filter').value = 'ALL';
+            setTab('ALL');
+            refreshUI();
+        }
+
+        // Rebuild the <option> lists in the header switcher, admin table filter, and deliverable form
+        function populateProjectSelectors() {
+            const optionsHtml = projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+
+            const switcher = document.getElementById('project-switcher');
+            if (switcher) {
+                switcher.innerHTML = optionsHtml;
+                switcher.value = activeProjectId;
+            }
+
+            const tableFilter = document.getElementById('admin-table-project-filter');
+            if (tableFilter) {
+                tableFilter.innerHTML = optionsHtml;
+                tableFilter.value = activeProjectId;
+            }
+
+            const formProject = document.getElementById('form-project');
+            if (formProject) {
+                formProject.innerHTML = optionsHtml;
+                formProject.value = activeProjectId;
             }
         }
 
         function updateKpis() {
-            const polycamCount = deliverables.filter(d => d.type === 'POLYCAM').length;
+            const items = currentProjectDeliverables();
+            const polycamCount = items.filter(d => d.type === 'POLYCAM').length;
             document.getElementById('kpi-polycam-count').innerHTML = `<i class="fa-solid fa-cube text-xs"></i> ${polycamCount} Polycam`;
-            document.getElementById('kpi-flights').textContent = `${deliverables.length * 4} Flights`;
-            
-            if (deliverables.length > 0) {
-                const sortedDates = deliverables.map(d => d.date).sort().reverse();
+            document.getElementById('kpi-flights').textContent = `${items.length * 4} Flights`;
+
+            if (items.length > 0) {
+                const sortedDates = items.map(d => d.date).sort().reverse();
                 document.getElementById('kpi-last-date').textContent = sortedDates[0];
+            } else {
+                document.getElementById('kpi-last-date').textContent = '—';
             }
         }
 
         function updateTabCounts() {
-            document.getElementById('badge-count-all').textContent = deliverables.length;
-            document.getElementById('badge-count-polycam').textContent = deliverables.filter(d => d.type === 'POLYCAM').length;
-            document.getElementById('badge-count-video').textContent = deliverables.filter(d => d.type === 'VIDEO').length;
-            document.getElementById('badge-count-photo').textContent = deliverables.filter(d => d.type === 'PHOTO').length;
+            const items = currentProjectDeliverables();
+            document.getElementById('badge-count-all').textContent = items.length;
+            document.getElementById('badge-count-polycam').textContent = items.filter(d => d.type === 'POLYCAM').length;
+            document.getElementById('badge-count-video').textContent = items.filter(d => d.type === 'VIDEO').length;
+            document.getElementById('badge-count-photo').textContent = items.filter(d => d.type === 'PHOTO').length;
         }
 
         function setTab(tab) {
@@ -758,7 +999,7 @@
             const searchQuery = document.getElementById('search-input').value.toLowerCase();
             const phaseQuery = document.getElementById('phase-filter').value;
 
-            const filtered = deliverables.filter(item => {
+            const filtered = currentProjectDeliverables().filter(item => {
                 const matchesTab = activeTab === 'ALL' || item.type === activeTab;
                 const matchesSearch = item.title.toLowerCase().includes(searchQuery) ||
                                       (item.notes && item.notes.toLowerCase().includes(searchQuery)) ||
@@ -969,7 +1210,11 @@
         }
 
         function openAdminDashboard() {
+            populateProjectSelectors();
+            resetAdminForm();
+            resetProjectForm();
             renderAdminTable();
+            renderProjectsAdminList();
             document.getElementById('admin-dashboard-modal').classList.remove('hidden');
         }
 
@@ -981,7 +1226,7 @@
             const tbody = document.getElementById('admin-table-body');
             tbody.innerHTML = '';
 
-            deliverables.forEach(item => {
+            currentProjectDeliverables().forEach(item => {
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-900/50 transition">
                         <td class="p-3 font-semibold text-white">${item.title}</td>
@@ -1007,6 +1252,7 @@
 
             const itemData = {
                 id: editId || ("hotel-" + Date.now()),
+                project: document.getElementById('form-project').value,
                 title: document.getElementById('form-title').value,
                 type: document.getElementById('form-type').value,
                 phase: document.getElementById('form-phase').value,
@@ -1036,6 +1282,7 @@
             if (!item) return;
 
             document.getElementById('form-edit-id').value = item.id;
+            document.getElementById('form-project').value = item.project;
             document.getElementById('form-title').value = item.title;
             document.getElementById('form-type').value = item.type;
             document.getElementById('form-phase').value = item.phase;
@@ -1053,9 +1300,136 @@
         function resetAdminForm() {
             document.getElementById('admin-deliverable-form').reset();
             document.getElementById('form-edit-id').value = '';
+            document.getElementById('form-project').value = activeProjectId;
             document.getElementById('admin-form-title').innerHTML = `<i class="fa-solid fa-plus"></i> Add New Hotel Deliverable`;
             document.getElementById('admin-cancel-edit-btn').classList.add('hidden');
             document.getElementById('form-submit-btn').textContent = "Save Deliverable";
+        }
+
+        // PROJECT ADMIN CRUD
+        function slugify(name) {
+            let base = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+            if (!base) base = 'project';
+            let slug = base;
+            let n = 2;
+            while (projects.some(p => p.id === slug)) {
+                slug = `${base}-${n}`;
+                n++;
+            }
+            return slug;
+        }
+
+        function renderProjectsAdminList() {
+            const list = document.getElementById('admin-projects-list');
+            if (!list) return;
+            list.innerHTML = '';
+
+            projects.forEach(p => {
+                const count = deliverables.filter(d => d.project === p.id).length;
+                list.innerHTML += `
+                    <div class="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-xl px-3 py-2">
+                        <div>
+                            <div class="text-xs font-bold text-white">${p.name}</div>
+                            <div class="text-[10px] text-slate-500">${p.location || 'No location set'} &middot; ${count} deliverable${count === 1 ? '' : 's'}</div>
+                        </div>
+                        <div class="space-x-1">
+                            <button onclick="editProject('${p.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-brand-cyan rounded-lg font-bold transition text-xs">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="deleteProject('${p.id}')" class="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-lg font-bold transition text-xs">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function handleProjectFormSubmit(e) {
+            e.preventDefault();
+            const editId = document.getElementById('proj-form-edit-id').value;
+            const name = document.getElementById('proj-form-name').value.trim();
+            if (!name) return;
+
+            const progressRaw = document.getElementById('proj-form-progress').value;
+            const projectData = {
+                id: editId || slugify(name),
+                name: name,
+                location: document.getElementById('proj-form-location').value,
+                phaseLabel: document.getElementById('proj-form-phase').value,
+                progress: progressRaw === '' ? 0 : Math.max(0, Math.min(100, parseInt(progressRaw, 10) || 0)),
+                description: document.getElementById('proj-form-description').value
+            };
+
+            if (editId) {
+                const idx = projects.findIndex(p => p.id === editId);
+                if (idx !== -1) projects[idx] = projectData;
+            } else {
+                projects.push(projectData);
+                activeProjectId = projectData.id;
+            }
+
+            saveProjectsToLocalStorage();
+            saveProjectToFirebaseItem(projectData);
+            populateProjectSelectors();
+            refreshUI();
+            resetProjectForm();
+            showToast(editId ? "Project updated!" : "New project added!");
+        }
+
+        function editProject(id) {
+            const p = projects.find(p => p.id === id);
+            if (!p) return;
+
+            document.getElementById('proj-form-edit-id').value = p.id;
+            document.getElementById('proj-form-name').value = p.name;
+            document.getElementById('proj-form-location').value = p.location || '';
+            document.getElementById('proj-form-phase').value = p.phaseLabel || '';
+            document.getElementById('proj-form-progress').value = (p.progress === undefined ? '' : p.progress);
+            document.getElementById('proj-form-description').value = p.description || '';
+
+            document.getElementById('project-form-title').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Edit Project`;
+            document.getElementById('project-cancel-edit-btn').classList.remove('hidden');
+            document.getElementById('project-form-submit-btn').textContent = "Update Project";
+        }
+
+        function resetProjectForm() {
+            document.getElementById('admin-project-form').reset();
+            document.getElementById('proj-form-edit-id').value = '';
+            document.getElementById('project-form-title').innerHTML = `<i class="fa-solid fa-plus"></i> Add New Project`;
+            document.getElementById('project-cancel-edit-btn').classList.add('hidden');
+            document.getElementById('project-form-submit-btn').textContent = "Save Project";
+        }
+
+        function deleteProject(id) {
+            if (projects.length <= 1) {
+                showToast("You need at least one project — can't delete the last one.");
+                return;
+            }
+            const p = projects.find(p => p.id === id);
+            if (!p) return;
+            const attachedCount = deliverables.filter(d => d.project === id).length;
+            const warning = attachedCount > 0
+                ? `Delete "${p.name}" and its ${attachedCount} deliverable(s)? This can't be undone.`
+                : `Delete "${p.name}"? This can't be undone.`;
+            if (!confirm(warning)) return;
+
+            projects = projects.filter(p => p.id !== id);
+            const removedDeliverableIds = deliverables.filter(d => d.project === id).map(d => d.id);
+            deliverables = deliverables.filter(d => d.project !== id);
+
+            if (activeProjectId === id) {
+                activeProjectId = projects[0].id;
+            }
+
+            saveProjectsToLocalStorage();
+            saveToLocalStorage();
+            deleteProjectFromFirebaseItem(id);
+            removedDeliverableIds.forEach(deleteFromFirebaseItem);
+
+            populateProjectSelectors();
+            refreshUI();
+            showToast("Project deleted.");
         }
 
         function deleteDeliverable(id) {
@@ -1116,14 +1490,25 @@
         function shareFilteredURL() {
             const phase = document.getElementById('phase-filter').value;
             const baseUrl = window.location.href.split('#')[0];
-            const shareUrl = `${baseUrl}#tab=${activeTab}&phase=${phase}`;
+            const shareUrl = `${baseUrl}#project=${encodeURIComponent(activeProjectId)}&tab=${activeTab}&phase=${encodeURIComponent(phase)}`;
             copyToClipboard(shareUrl);
+        }
+
+        // Read a single param out of the URL hash without disturbing anything else
+        function getHashParam(key) {
+            const hash = window.location.hash.substring(1);
+            if (!hash) return null;
+            const params = new URLSearchParams(hash);
+            return params.has(key) ? params.get(key) : null;
         }
 
         function checkHashParams() {
             const hash = window.location.hash.substring(1);
             if (!hash) return;
             const params = new URLSearchParams(hash);
+            if (params.has('project') && projects.some(p => p.id === params.get('project'))) {
+                activeProjectId = params.get('project');
+            }
             if (params.has('tab')) setTab(params.get('tab'));
             if (params.has('phase')) {
                 document.getElementById('phase-filter').value = params.get('phase');
@@ -1151,7 +1536,11 @@
         }
 
         function setupEventListeners() {
-            window.addEventListener('hashchange', checkHashParams);
+            window.addEventListener('hashchange', () => {
+                checkHashParams();
+                populateProjectSelectors();
+                updateProjectBanner();
+            });
         }
     </script>
 </body>
