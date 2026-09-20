@@ -213,6 +213,12 @@
                     <span>High-Res Aerial Photos</span>
                     <span id="badge-count-photo" class="bg-slate-800 px-2 py-0.5 rounded-md text-[10px] text-slate-300">0</span>
                 </button>
+
+                <button onclick="setTab('INSTA360')" id="tab-INSTA360" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800">
+                    <i class="fa-solid fa-globe text-violet-400"></i>
+                    <span>360&deg; Insta360 Media</span>
+                    <span id="badge-count-insta360" class="bg-slate-800 px-2 py-0.5 rounded-md text-[10px] text-slate-300">0</span>
+                </button>
             </div>
 
             <!-- Search Bar & Phase Filters -->
@@ -481,6 +487,7 @@
                                 <option value="POLYCAM">3D Polycam Embed</option>
                                 <option value="VIDEO">4K Site Video</option>
                                 <option value="PHOTO">High-Res Photo / Map</option>
+                                <option value="INSTA360">360&deg; Insta360 Photo / Video</option>
                             </select>
                         </div>
 
@@ -502,13 +509,13 @@
                         </div>
 
                         <div>
-                            <label class="block font-semibold text-slate-300 mb-1">Cover Thumbnail Image URL</label>
+                            <label class="block font-semibold text-slate-300 mb-1">Cover Thumbnail Image URL <span class="text-slate-500 font-normal">(optional — auto-generated if blank)</span></label>
                             <input type="url" id="form-thumb" placeholder="https://images.unsplash.com/..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-brand-500 focus:outline-none">
                         </div>
 
                         <div>
                             <label class="block font-semibold text-slate-300 mb-1">Embed URL (Polycam / YouTube / Direct)</label>
-                            <input type="text" id="form-embed" placeholder="https://poly.cam/capture/embed/... or any youtube.com / youtu.be link" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-brand-500 focus:outline-none">
+                            <input type="text" id="form-embed" placeholder="https://poly.cam/capture/embed/..., youtube.com/youtu.be link, or s.insta360.com/p/... link" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white focus:border-brand-500 focus:outline-none">
                         </div>
 
                         <div class="sm:col-span-2">
@@ -723,8 +730,26 @@
         // APP VERSION / CHANGELOG
         // Bump APP_VERSION and add a new entry (top of the array) whenever you make a
         // meaningful change and push it up, so you can tell which build is live at a glance.
-        const APP_VERSION = "1.3.0";
+        const APP_VERSION = "1.5.0";
         const CHANGELOG = [
+            {
+                version: "1.5.0",
+                date: "2026-09-20",
+                notes: [
+                    "Added a new 360\u00b0 Insta360 media type (own tab, badge, and iframe viewer) for both 360 photos and videos",
+                    "Insta360 share links (s.insta360.com/p/...) now auto-convert to the embeddable ?e=true URL on save, fixing the 'refused to connect' error",
+                    "Insta360 deliverables get an auto-generated branded placeholder thumbnail if left blank (same limitation as Polycam \u2014 no public per-share thumbnail URL)"
+                ]
+            },
+            {
+                version: "1.4.0",
+                date: "2026-09-20",
+                notes: [
+                    "YouTube deliverables now auto-pull their thumbnail from the video ID if left blank",
+                    "Polycam deliverables get an auto-generated branded placeholder thumbnail if left blank (Polycam has no public per-capture thumbnail URL to pull a real screenshot from)",
+                    "Photo deliverables default their thumbnail to the full-res image URL if left blank"
+                ]
+            },
             {
                 version: "1.3.0",
                 date: "2026-09-20",
@@ -1070,6 +1095,7 @@
             document.getElementById('badge-count-polycam').textContent = items.filter(d => d.type === 'POLYCAM').length;
             document.getElementById('badge-count-video').textContent = items.filter(d => d.type === 'VIDEO').length;
             document.getElementById('badge-count-photo').textContent = items.filter(d => d.type === 'PHOTO').length;
+            document.getElementById('badge-count-insta360').textContent = items.filter(d => d.type === 'INSTA360').length;
         }
 
         function setTab(tab) {
@@ -1134,6 +1160,10 @@
                     badgeClass = "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30";
                     typeIcon = "fa-camera";
                     typeLabel = "High-Res Aerial Photo";
+                } else if (item.type === 'INSTA360') {
+                    badgeClass = "bg-violet-500/10 text-violet-400 border border-violet-500/30";
+                    typeIcon = "fa-globe";
+                    typeLabel = "360\u00b0 Insta360 Media";
                 }
 
                 const cardHtml = `
@@ -1221,6 +1251,11 @@
             } else if (item.type === 'PHOTO') {
                 viewerContainer.innerHTML = `
                     <img src="${item.embedUrl || item.thumbnail}" class="w-full h-full object-contain bg-slate-950" alt="High Res Photo">
+                `;
+            } else if (item.type === 'INSTA360') {
+                const insta360Src = normalizeInsta360EmbedUrl(item.embedUrl);
+                viewerContainer.innerHTML = `
+                    <iframe src="${insta360Src}" title="Insta360 360-degree viewer" class="w-full h-full border-0" allow="gyroscope; accelerometer" allowfullscreen></iframe>
                 `;
             }
 
@@ -1367,11 +1402,92 @@
             return trimmed;
         }
 
+        // Insta360 share links (s.insta360.com/p/<id>) need the "?e=true" embed flag
+        // or they refuse to load in an iframe, the same way a YouTube watch page does.
+        function normalizeInsta360EmbedUrl(url) {
+            if (!url) return url;
+            const trimmed = url.trim();
+            const match = trimmed.match(/s\.insta360\.com\/p\/([a-zA-Z0-9]+)/);
+            if (match) return `https://s.insta360.com/p/${match[1]}?e=true&locale=en-us`;
+            return trimmed;
+        }
+
+        // Pulls the video ID back out of an already-normalized youtube.com/embed/ URL.
+        function extractYouTubeId(embedUrl) {
+            if (!embedUrl) return null;
+            const match = embedUrl.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
+            return match ? match[1] : null;
+        }
+
+        // YouTube always generates this size for every uploaded video, so it's a safe
+        // thumbnail to auto-fill (unlike maxresdefault.jpg, which not all videos have).
+        function youtubeThumbnailUrl(videoId) {
+            return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+        }
+
+        // Polycam has no public per-capture thumbnail/screenshot URL, so instead of a
+        // misleading generic stock photo, generate a small branded SVG placeholder.
+        function polycamPlaceholderThumbnail() {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+                <rect width="800" height="450" fill="#0f172a"/>
+                <rect width="800" height="450" fill="#ea580c" opacity="0.08"/>
+                <g transform="translate(400,190)">
+                    <polygon points="0,-70 65,-35 65,35 0,70 -65,35 -65,-35" fill="none" stroke="#f97316" stroke-width="4"/>
+                    <polygon points="0,-70 65,-35 0,0 -65,-35" fill="#f97316" opacity="0.35"/>
+                    <polygon points="0,0 65,-35 65,35 0,70" fill="#ea580c" opacity="0.55"/>
+                    <polygon points="0,0 -65,-35 -65,35 0,70" fill="#fb923c" opacity="0.45"/>
+                </g>
+                <text x="400" y="300" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#f8fafc" text-anchor="middle" letter-spacing="2">3D POLYCAM SCAN</text>
+            </svg>`;
+            return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+        }
+
+        // Insta360 has no public per-share thumbnail URL either, so give 360 media its
+        // own branded placeholder (distinct color from the Polycam one).
+        function insta360PlaceholderThumbnail() {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+                <rect width="800" height="450" fill="#0f172a"/>
+                <rect width="800" height="450" fill="#7c3aed" opacity="0.08"/>
+                <g transform="translate(400,190)">
+                    <circle r="70" fill="none" stroke="#a78bfa" stroke-width="4"/>
+                    <ellipse cx="0" cy="0" rx="70" ry="24" fill="none" stroke="#a78bfa" stroke-width="4"/>
+                    <ellipse cx="0" cy="0" rx="24" ry="70" fill="none" stroke="#a78bfa" stroke-width="4"/>
+                </g>
+                <text x="400" y="300" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#f8fafc" text-anchor="middle" letter-spacing="2">360&#176; INSTA360 MEDIA</text>
+            </svg>`;
+            return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+        }
+
+        const DEFAULT_THUMBNAIL = "https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=800&q=80";
+
+        // Only auto-fills when the Cover Thumbnail field was left blank — an explicit
+        // thumbnail URL the user typed in always wins.
+        function resolveThumbnail(type, manualThumb, finalEmbedUrl) {
+            if (manualThumb) return manualThumb;
+            if (type === 'VIDEO') {
+                const videoId = extractYouTubeId(finalEmbedUrl);
+                if (videoId) return youtubeThumbnailUrl(videoId);
+            } else if (type === 'POLYCAM') {
+                return polycamPlaceholderThumbnail();
+            } else if (type === 'INSTA360') {
+                return insta360PlaceholderThumbnail();
+            } else if (type === 'PHOTO' && finalEmbedUrl) {
+                return finalEmbedUrl;
+            }
+            return DEFAULT_THUMBNAIL;
+        }
+
         function handleAdminFormSubmit(e) {
             e.preventDefault();
             const editId = document.getElementById('form-edit-id').value;
             const rawEmbedUrl = document.getElementById('form-embed').value;
             const type = document.getElementById('form-type').value;
+            const manualThumb = document.getElementById('form-thumb').value.trim();
+
+            const finalEmbedUrl = type === 'VIDEO' ? normalizeVideoEmbedUrl(rawEmbedUrl)
+                : type === 'POLYCAM' ? normalizePolycamEmbedUrl(rawEmbedUrl)
+                : type === 'INSTA360' ? normalizeInsta360EmbedUrl(rawEmbedUrl)
+                : rawEmbedUrl;
 
             const itemData = {
                 id: editId || ("hotel-" + Date.now()),
@@ -1380,10 +1496,8 @@
                 type: type,
                 phase: document.getElementById('form-phase').value,
                 date: document.getElementById('form-date').value,
-                thumbnail: document.getElementById('form-thumb').value || "https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=800&q=80",
-                embedUrl: type === 'VIDEO' ? normalizeVideoEmbedUrl(rawEmbedUrl)
-                    : type === 'POLYCAM' ? normalizePolycamEmbedUrl(rawEmbedUrl)
-                    : rawEmbedUrl,
+                thumbnail: resolveThumbnail(type, manualThumb, finalEmbedUrl),
+                embedUrl: finalEmbedUrl,
                 driveUrl: document.getElementById('form-drive').value,
                 notes: document.getElementById('form-notes').value
             };
